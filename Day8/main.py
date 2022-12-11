@@ -6,9 +6,6 @@ def read_input():
         return [[int(ch) for ch in line.strip()] for line in f.readlines()]
 
 def view_dist(this, trees):
-    if len(trees) == 0:
-        return 0
-
     for i, val in enumerate(trees):
         if val >= this:
             return i + 1
