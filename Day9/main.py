@@ -2,9 +2,10 @@ import pathlib
 import numpy as np
 import math
 from dataclasses import dataclass
+from pprint import pprint
 
 def read_input():
-    with open(f"{pathlib.Path(__file__).parent.resolve()}/input.txt", "r") as f:
+    with open(f"{pathlib.Path(__file__).parent.resolve()}/input3.txt", "r") as f:
         return [x.strip().split(" ") for x in f.readlines()]
 
 def part1():    
@@ -46,29 +47,31 @@ class Knot():
     def __repr__(self):
         return f"{self.x}, {self.y}"
 
-def move(grid, knots, x, y, head):
+def move(knots, x, y, head):
         knot = knots[0]
         xprev,yprev = knot.x,knot.y
         if head:
             knot.x += x
             knot.y += y
         else:
-            we cant move to the previous x,y when using more tails 
             knot.x = x
             knot.y = y
 
         if len(knots) == 1:
-            grid[x][y] += 1
             return
 
-        if int(math.sqrt((knot.x - knots[1].x)**2 + (knot.y - knots[1].y)**2)) > 1:
-            move(grid, knots[1:], xprev, yprev, False)
+        dist = math.sqrt((knot.x - knots[1].x)**2 + (knot.y - knots[1].y)**2)
+        if dist == 2:
+            move(knots[1:], xprev, yprev, False)
+        elif dist > 2:
+            move(knots[1:], int(math.copysign(1, knot.x - knots[1].x)), int(math.copysign(1, knot.y - knots[1].y)), True)
 
             
 def part2():
     res = 0
-    grid = np.zeros((1000,1000), np.int32)
-    knots = [Knot(len(grid)//2, len(grid[0])//2) for x in range(10)]
+    knots = [Knot(10, 10) for x in range(10)]
+    visited = []
+
 
     for com in read_input():
         dx,dy = 0,0
@@ -85,13 +88,24 @@ def part2():
             assert(False)
 
         for _ in range(dist):
-            move(grid, knots, dx, dy, True)
+            if (knots[-1].x, knots[-1].y) not in visited:
+                visited.append((knots[-1].x, knots[-1].y))
+            move(knots, dx, dy, True)
+
+            grid = []
+            for i in range(20):
+                row = []
+                for j in range(20):
+                    row.append('.')
+                grid.append(row)
+
+            for i,knot in enumerate(knots):
+                grid[knot.y][knot.x] = str(i)
+            print(np.matrix(grid))
+
+
     
-    for x in grid:
-        for y in x:
-            if y > 0:
-                res += 1
-    return res + 1
+    return len(visited)
 
 if __name__ == '__main__':
     print(f"part1: {part1()}")
