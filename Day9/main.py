@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from pprint import pprint
 
 def read_input():
-    with open(f"{pathlib.Path(__file__).parent.resolve()}/input3.txt", "r") as f:
+    with open(f"{pathlib.Path(__file__).parent.resolve()}/input.txt", "r") as f:
         return [x.strip().split(" ") for x in f.readlines()]
 
 def part1():    
@@ -47,29 +47,32 @@ class Knot():
     def __repr__(self):
         return f"{self.x}, {self.y}"
 
-def move(knots, x, y, head):
+def tns(n):
+    if n > 0:
+        return 1
+    elif n < 0: 
+        return -1
+    return 0
+
+def move(knots, dx, dy):
         knot = knots[0]
-        xprev,yprev = knot.x,knot.y
-        if head:
-            knot.x += x
-            knot.y += y
-        else:
-            knot.x = x
-            knot.y = y
+
+        knot.x += dx
+        knot.y += dy
 
         if len(knots) == 1:
             return
 
         dist = math.sqrt((knot.x - knots[1].x)**2 + (knot.y - knots[1].y)**2)
         if dist == 2:
-            move(knots[1:], xprev, yprev, False)
+            move(knots[1:], tns(knot.x-knots[1].x), tns(knot.y-knots[1].y))
         elif dist > 2:
-            move(knots[1:], int(math.copysign(1, knot.x - knots[1].x)), int(math.copysign(1, knot.y - knots[1].y)), True)
+            move(knots[1:], int(math.copysign(1, knot.x - knots[1].x)), int(math.copysign(1, knot.y - knots[1].y)))
 
             
 def part2():
     res = 0
-    knots = [Knot(10, 10) for x in range(10)]
+    knots = [Knot(14, 10) for x in range(10)]
     visited = []
 
 
@@ -90,18 +93,18 @@ def part2():
         for _ in range(dist):
             if (knots[-1].x, knots[-1].y) not in visited:
                 visited.append((knots[-1].x, knots[-1].y))
-            move(knots, dx, dy, True)
+            move(knots, dx, dy)
 
-            grid = []
-            for i in range(20):
-                row = []
-                for j in range(20):
-                    row.append('.')
-                grid.append(row)
+            # grid = []
+            # for i in range(25):
+            #     row = []
+            #     for j in range(25):
+            #         row.append('.')
+            #     grid.append(row)
 
-            for i,knot in enumerate(knots):
-                grid[knot.y][knot.x] = str(i)
-            print(np.matrix(grid))
+            # for i,knot in enumerate(knots):
+            #     grid[knot.y][knot.x] = str(i)
+            # print(np.matrix(grid))
 
 
     
